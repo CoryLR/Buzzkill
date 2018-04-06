@@ -2,7 +2,7 @@
 function main() {
 
     // prep map variables
-    var [width, height, map, projection, path] = prepMapVars()
+    var [width, height, map, path] = prepMapVars()
 
     // LOAD DATA
     // Load the data & states layer asynchronously (d3.queue is depreciated!)
@@ -15,16 +15,19 @@ function main() {
         var [csvData, jsonStates] = promiseValues
         console.log(csvData, jsonStates)
 
-        // make map & get feature collection
-        topoJsonStates = makeMap(jsonStates, map, path);
+        // make map & get feature collection variable
+        topoJsonStates = makeMap(jsonStates, map, path, csvData, expressed);
 
         // get variables for data join
-        var [attrArray, attrName, attrDesc] = prepAttrVars();
+        var [attrArray, expressed, attrName, attrDesc] = prepAttrVars();
 
-        //join data
+        //join csv data to the topojson
         joinData(csvData, topoJsonStates, attrArray);
-
         console.log(topoJsonStates);
+
+
+
+
 
     });
 
@@ -52,13 +55,16 @@ function prepMapVars() {
     var path = d3.geoPath()
         .projection(projection);
 
-    return [width, height, map, projection, path]
+    return [width, height, map, path]
 
 };
 
 function prepAttrVars() {
 
     var attrArray = ["BDP", "BDI", "BDF", "LDM", "PCC", "HLL"];
+
+    // initial & current attribute displayed on the map
+    var expressed = attrArray[0];
 
     var attrName = {
         BDP: "Binge Drinking Prevalence",
@@ -80,11 +86,11 @@ function prepAttrVars() {
 
     // descriptions Source: https://www.cdc.gov/cdi/definitions/alcohol.html
 
-    return [attrArray, attrName, attrDesc]
+    return [attrArray, expressed, attrName, attrDesc]
 
 };
 
-function makeMap(jsonStates, map, path) {
+function makeMap(jsonStates, map, path, csvData, expressed) {
     //translate states TopoJSON
     var topoJsonStates = topojson.feature(jsonStates, jsonStates.objects.ne_states_d3display);
     console.log(topoJsonStates);
@@ -95,6 +101,12 @@ function makeMap(jsonStates, map, path) {
         .datum(topoJsonStates)
         .attr("class", "states")
         .attr("d", path);
+
+    //create the color scale
+    var colorScale = makeColorScale(csvData, expressed);
+
+    //Example 1.3 line 24...add enumeration units to the map
+    setEnumerationUnits(jsonStates, map, path, colorScale, expressed);
 
     return topoJsonStates
 };
@@ -124,6 +136,51 @@ function joinData(csvData, topoJsonStates, attrArray) {
             };
         };
     };
+};
+
+//function to create color scale generator
+function makeColorScale(data, expressed) {
+    var colorClasses = [
+        "#D4B9DA",
+        "#C994C7",
+        "#DF65B0",
+        "#DD1C77",
+        "#980043"
+    ];
+
+    //create color scale generator
+    var colorScale = d3.scaleQuantile()
+        .range(colorClasses);
+
+    //build two-value array of minimum and maximum expressed attribute values
+    var minmax = [
+        d3.min(data, function (d) {
+            return parseFloat(d[expressed]);
+        }),
+        d3.max(data, function (d) {
+            return parseFloat(d[expressed]);
+        })
+    ];
+    //assign two-value array as scale domain
+    colorScale.domain(minmax);
+
+    return colorScale;
+};
+
+function setEnumerationUnits(jsonStates, map, path, colorScale, expressed) {
+
+    //add France regions to map
+    var regions = map.selectAll(".states")
+        .data(jsonStates)
+        .enter()
+        .append("path")
+        .attr("class", function (d) {
+            return "regions " + d.properties.postal;
+        })
+        .attr("d", path)
+        .style("fill", function (d) {
+            return colorScale(d.properties[expressed]);
+        });
 };
 
 // Start JavaScript when window loads
