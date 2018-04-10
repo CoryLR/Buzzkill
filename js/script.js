@@ -227,10 +227,19 @@ function choropleth(props, colorScale, expressed) {
 function setChart(csvData, colorScale, expressed) {
     //chart frame dimensions
     var chartWidth = 650,
-        chartHeight = 200;
+        //    var chartWidth = window.innerWidth * 0.425,
+        chartHeight = 300,
+        leftPadding = 25,
+        rightPadding = 2,
+        topBottomPadding = 5,
+        chartInnerWidth = chartWidth,
+        //        chartInnerWidth = chartWidth - leftPadding - rightPadding,
+
+        chartInnerHeight = chartHeight - topBottomPadding * 2,
+        translate = "translate(" + leftPadding + "," + topBottomPadding + ")";
 
     //create a second svg element to hold the bar chart
-    var chart = d3.select("body")
+    var br = d3.select("body")
         .append("br")
 
     var chart = d3.select("body")
@@ -250,6 +259,9 @@ function setChart(csvData, colorScale, expressed) {
         .data(csvData)
         .enter()
         .append("rect")
+        .sort(function (a, b) {
+            return b[expressed] - a[expressed]
+        })
         .attr("class", function (d) {
             return "bars " + d.adm1_code;
         })
@@ -266,6 +278,54 @@ function setChart(csvData, colorScale, expressed) {
         .style("fill", function (d) {
             return choropleth(d, colorScale, expressed);
         });
+
+    //annotate bars with attribute value text
+    var numbers = chart.selectAll(".numbers")
+        .data(csvData)
+        .enter()
+        .append("text")
+        .sort(function (a, b) {
+            return b[expressed] - a[expressed]
+        })
+        .attr("class", function (d) {
+            return "numbers " + d.adm1_code;
+        })
+        .attr("text-anchor", "middle")
+        .attr("x", function (d, i) {
+            var fraction = chartWidth / csvData.length;
+            return i * fraction + (fraction - 1) / 2;
+        })
+        .attr("y", function (d) {
+            return chartHeight - yScale(parseFloat(d[expressed])) + 15;
+        })
+        .text(function (d) {
+            return d[expressed];
+        });
+
+    var chartTitle = chart.append("text")
+        .attr("x", 50)
+        .attr("y", 30)
+        .attr("class", "chartTitle")
+        .text(expressed + " in each state");
+
+    //create vertical axis generator
+    var yAxis = d3.axisLeft(yScale)
+        //.scale(yScale)
+        //        .orient("left");
+
+
+    //place axis
+    var axis = chart.append("g")
+        .attr("class", "axis")
+        .attr("transform", translate)
+        .call(yAxis);
+
+    //create frame for chart border
+    var chartFrame = chart.append("rect")
+        .attr("class", "chartFrame")
+        .attr("width", chartInnerWidth)
+        .attr("height", chartInnerHeight)
+        .attr("transform", translate);
 
 };
 
