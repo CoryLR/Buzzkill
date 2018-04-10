@@ -13,17 +13,21 @@ function main() {
 
         // unpack the loaded data into variables
         var [csvData, jsonStates] = promiseValues
-        console.log(csvData, jsonStates)
+        //console.log(csvData, jsonStates)
 
-        // make map & get feature collection variable
-        topoJsonStates = makeMap(jsonStates, map, path, csvData, expressed);
+        // get necessary variables
+        var [attrArray, expressed, attrName, attrDesc, topoJsonStates] = prepAttrVars();
 
-        // get variables for data join
-        var [attrArray, expressed, attrName, attrDesc] = prepAttrVars();
+        // translate states TopoJSON
+        var topoJsonStates = topojson.feature(jsonStates, jsonStates.objects.ne_states_d3display).features;
 
         //join csv data to the topojson
         joinData(csvData, topoJsonStates, attrArray);
         console.log(topoJsonStates);
+
+        // make map & coordinated visualization
+        makeMap(topoJsonStates, map, path, csvData, expressed);
+
 
 
 
@@ -35,8 +39,8 @@ function main() {
 
 function prepMapVars() {
     //map frame dimensions
-    var width = 960,
-        height = 460;
+    var width = 650,
+        height = 500;
 
     //create new svg container for the map
     var map = d3.select("body")
@@ -47,10 +51,11 @@ function prepMapVars() {
 
     //create Albers equal area conic projection centered on France
     var projection = d3.geoAlbers()
-        //        .center([0, 46.2])
-        //        .rotate([-2, 0, 0])
-        //        .parallels([43, 62])
-        .scale(800) //        .translate([width / 2, height / 2]);
+        .center([13, 38])
+
+    //        .rotate([-2, 0, 0])
+    //        .parallels([43, 62])
+    .scale(800) //        .translate([width / 2, height / 2]);
 
     var path = d3.geoPath()
         .projection(projection);
@@ -90,25 +95,40 @@ function prepAttrVars() {
 
 };
 
-function makeMap(jsonStates, map, path, csvData, expressed) {
-    //translate states TopoJSON
-    var topoJsonStates = topojson.feature(jsonStates, jsonStates.objects.ne_states_d3display);
-    console.log(topoJsonStates);
+function makeMap(topoJsonStates, map, path, csvData, expressed) {
+    //console.log(topoJsonStates);
 
 
+    // NOT FOR CORY
     //add states countries to map
-    var statesLayer = map.append("path")
-        .datum(topoJsonStates)
-        .attr("class", "states")
-        .attr("d", path);
+    //    var statesLayer = map.append("path")
+    //        .datum(topoJsonStates)
+    //        .attr("class", "states")
+    //        .attr("d", path);
+
+
+
+    //    var regions = map.selectAll(".regions")
+    //        .data(topoJsonStates)
+    //        .enter()
+    //        .append("path")
+    //        .attr("class", function (d) {
+    //            return "states " + d.properties.postal;
+    //        })
+    //        .attr("d", path);
+    //    console.log("regions");
+    //    console.log(topoJsonStates);
+
 
     //create the color scale
     var colorScale = makeColorScale(csvData, expressed);
 
     //Example 1.3 line 24...add enumeration units to the map
-    setEnumerationUnits(jsonStates, map, path, colorScale, expressed);
+    setEnumerationUnits(topoJsonStates, map, path, colorScale, expressed);
 
-    return topoJsonStates
+    //add coordinated visualization to the map
+    setChart(csvData, colorScale, expressed);
+
 };
 
 function joinData(csvData, topoJsonStates, attrArray) {
@@ -118,9 +138,9 @@ function joinData(csvData, topoJsonStates, attrArray) {
         var csvKey = csvRegion.ABBR; //the CSV primary key
 
         //loop through geojson regions to find correct region
-        for (var a = 0; a < topoJsonStates.features.length; a++) {
+        for (var a = 0; a < topoJsonStates.length; a++) {
 
-            var geojsonProps = topoJsonStates.features[a].properties; //the current region geojson properties
+            var geojsonProps = topoJsonStates[a].properties; //the current region geojson properties
             var geojsonKey = geojsonProps.postal; //the geojson primary key
 
             //where primary keys match, transfer csv data to geojson properties object
@@ -164,24 +184,92 @@ function makeColorScale(data, expressed) {
     //assign two-value array as scale domain
     colorScale.domain(minmax);
 
+    console.log("colorScale");
+    console.log(colorScale);
+
     return colorScale;
 };
 
-function setEnumerationUnits(jsonStates, map, path, colorScale, expressed) {
+function setEnumerationUnits(topoJsonStates, map, path, colorScale, expressed) {
 
-    //add France regions to map
+
+    console.log("Starting setEnumerationUnits");
+    //add states to map - broken somewhere in this var block
     var regions = map.selectAll(".states")
-        .data(jsonStates)
+        .data(topoJsonStates)
         .enter()
         .append("path")
         .attr("class", function (d) {
-            return "regions " + d.properties.postal;
+            var returnVar = "states " + d.properties.postal; //postal, ABBR, STATE
+            //console.log("returnVar");
+            //console.log(returnVar);
+            return returnVar;
         })
         .attr("d", path)
         .style("fill", function (d) {
-            return colorScale(d.properties[expressed]);
+            return choropleth(d.properties, colorScale, expressed);
         });
+    console.log("End setEnumerationUnits");
 };
+
+function choropleth(props, colorScale, expressed) {
+    //make sure attribute value is a number
+    var val = parseFloat(props[expressed]);
+    //if attribute value exists, assign a color; otherwise assign gray
+    if (typeof val == 'number' && !isNaN(val)) {
+        return colorScale(val);
+    } else {
+        return "#CCC";
+    };
+};
+
+//function to create coordinated bar chart
+function setChart(csvData, colorScale, expressed) {
+    //chart frame dimensions
+    var chartWidth = 650,
+        chartHeight = 200;
+
+    //create a second svg element to hold the bar chart
+    var chart = d3.select("body")
+        .append("br")
+
+    var chart = d3.select("body")
+        .append("svg")
+        .attr("width", chartWidth)
+        .attr("height", chartHeight)
+        .attr("class", "chart");
+
+    //create a scale to size bars proportionally to frame
+    var yScale = d3.scaleLinear()
+        .range([0, chartHeight])
+        .domain([0, 30]);
+
+
+    //Example 2.4 line 8...set bars for each province
+    var bars = chart.selectAll(".bars")
+        .data(csvData)
+        .enter()
+        .append("rect")
+        .attr("class", function (d) {
+            return "bars " + d.adm1_code;
+        })
+        .attr("width", chartWidth / csvData.length - 1)
+        .attr("x", function (d, i) {
+            return i * (chartWidth / csvData.length);
+        })
+        .attr("height", function (d) {
+            return yScale(parseFloat(d[expressed]));
+        })
+        .attr("y", function (d) {
+            return chartHeight - yScale(parseFloat(d[expressed]));
+        })
+        .style("fill", function (d) {
+            return choropleth(d, colorScale, expressed);
+        });
+
+};
+
+
 
 // Start JavaScript when window loads
 window.onload = main()

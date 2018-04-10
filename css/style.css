@@ -1,6 +1,19 @@
+body {
+    text-align: center;
+}
+
+.map {
+    border: medium solid #999;
+}
+
 .states {
     /*    fill: #FFF;
     */
-    stroke: #CCC;
-    stroke-width: 2px;
+    stroke: white;
+    stroke-width: 1px;
+}
+
+.chart {
+    background-color: rgba(128, 128, 128, .2);
+    border: medium solid #999;
 }
