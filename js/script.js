@@ -13,17 +13,23 @@ function main() {
 
         // unpack the loaded data into variables
         var [csvData, jsonStates] = promiseValues
-        console.log(csvData, jsonStates)
-
-        // make map & get feature collection variable
-        topoJsonStates = makeMap(jsonStates, map, path, csvData, expressed);
+        //console.log(csvData, jsonStates)
 
         // get variables for data join
         var [attrArray, expressed, attrName, attrDesc] = prepAttrVars();
 
+        // get feature collection variable
+        //translate states TopoJSON
+        var topoJsonStates = topojson.feature(jsonStates, jsonStates.objects.ne_states_d3display).features;
+
         //join csv data to the topojson
         joinData(csvData, topoJsonStates, attrArray);
         console.log(topoJsonStates);
+
+        // make map
+        makeMap(topoJsonStates, map, path, csvData, expressed);
+
+
 
 
 
@@ -90,23 +96,36 @@ function prepAttrVars() {
 
 };
 
-function makeMap(jsonStates, map, path, csvData, expressed) {
-    //translate states TopoJSON
-    var topoJsonStates = topojson.feature(jsonStates, jsonStates.objects.ne_states_d3display);
-    console.log(topoJsonStates);
+function makeMap(topoJsonStates, map, path, csvData, expressed) {
+    //console.log(topoJsonStates);
 
 
+    // NOT FOR CORY
     //add states countries to map
-    var statesLayer = map.append("path")
-        .datum(topoJsonStates)
-        .attr("class", "states")
-        .attr("d", path);
+    //    var statesLayer = map.append("path")
+    //        .datum(topoJsonStates)
+    //        .attr("class", "states")
+    //        .attr("d", path);
+
+
+
+    //    var regions = map.selectAll(".regions")
+    //        .data(topoJsonStates)
+    //        .enter()
+    //        .append("path")
+    //        .attr("class", function (d) {
+    //            return "states " + d.properties.postal;
+    //        })
+    //        .attr("d", path);
+    //    console.log("regions");
+    //    console.log(topoJsonStates);
+
 
     //create the color scale
     var colorScale = makeColorScale(csvData, expressed);
 
     //Example 1.3 line 24...add enumeration units to the map
-    setEnumerationUnits(jsonStates, map, path, colorScale, expressed);
+    setEnumerationUnits(topoJsonStates, map, path, colorScale, expressed);
 
     return topoJsonStates
 };
@@ -118,9 +137,9 @@ function joinData(csvData, topoJsonStates, attrArray) {
         var csvKey = csvRegion.ABBR; //the CSV primary key
 
         //loop through geojson regions to find correct region
-        for (var a = 0; a < topoJsonStates.features.length; a++) {
+        for (var a = 0; a < topoJsonStates.length; a++) {
 
-            var geojsonProps = topoJsonStates.features[a].properties; //the current region geojson properties
+            var geojsonProps = topoJsonStates[a].properties; //the current region geojson properties
             var geojsonKey = geojsonProps.postal; //the geojson primary key
 
             //where primary keys match, transfer csv data to geojson properties object
@@ -164,24 +183,43 @@ function makeColorScale(data, expressed) {
     //assign two-value array as scale domain
     colorScale.domain(minmax);
 
+    console.log("colorScale");
+    console.log(colorScale);
+
     return colorScale;
 };
 
-function setEnumerationUnits(jsonStates, map, path, colorScale, expressed) {
+function setEnumerationUnits(topoJsonStates, map, path, colorScale, expressed) {
 
-    //add France regions to map
+
+    console.log("Starting setEnumerationUnits");
+    //add states to map - broken somewhere in this var block
     var regions = map.selectAll(".states")
-        .data(jsonStates)
+        .data(topoJsonStates)
         .enter()
         .append("path")
         .attr("class", function (d) {
-            return "regions " + d.properties.postal;
+            var returnVar = "states " + d.properties.postal; //postal, ABBR, STATE
+            //console.log("returnVar");
+            //console.log(returnVar);
+            return returnVar;
         })
         .attr("d", path)
         .style("fill", function (d) {
-            return colorScale(d.properties[expressed]);
+            return choropleth(d.properties, colorScale, expressed);
         });
+    console.log("End setEnumerationUnits");
 };
 
+function choropleth(props, colorScale, expressed) {
+    //make sure attribute value is a number
+    var val = parseFloat(props[expressed]);
+    //if attribute value exists, assign a color; otherwise assign gray
+    if (typeof val == 'number' && !isNaN(val)) {
+        return colorScale(val);
+    } else {
+        return "#CCC";
+    };
+};
 // Start JavaScript when window loads
 window.onload = main()
