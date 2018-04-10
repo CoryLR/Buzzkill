@@ -233,7 +233,7 @@ function setChart(csvData, colorScale, expressed) {
         rightPadding = 2,
         topBottomPadding = 5,
         chartInnerWidth = chartWidth,
-        //        chartInnerWidth = chartWidth - leftPadding - rightPadding,
+        chartInnerWidth = chartWidth - leftPadding - rightPadding,
 
         chartInnerHeight = chartHeight - topBottomPadding * 2,
         translate = "translate(" + leftPadding + "," + topBottomPadding + ")";
@@ -253,6 +253,10 @@ function setChart(csvData, colorScale, expressed) {
         .range([0, chartHeight])
         .domain([0, 30]);
 
+    var yScaleAxis = d3.scaleLinear()
+        .range([chartHeight, 0])
+        .domain([0, 30]);
+
 
     //Example 2.4 line 8...set bars for each province
     var bars = chart.selectAll(".bars")
@@ -263,13 +267,18 @@ function setChart(csvData, colorScale, expressed) {
             return b[expressed] - a[expressed]
         })
         .attr("class", function (d) {
-            return "bars " + d.adm1_code;
+            console.log("d.postal");
+            console.log(d.ABBR);
+            return "bars " + d.ABBR;
         })
         .attr("width", chartWidth / csvData.length - 1)
         .attr("x", function (d, i) {
             return i * (chartWidth / csvData.length);
         })
         .attr("height", function (d) {
+            console.log("parseFloat(d[expressed])");
+            console.log(parseFloat(d[expressed]));
+            console.log(yScale(parseFloat(d[expressed])));
             return yScale(parseFloat(d[expressed]));
         })
         .attr("y", function (d) {
@@ -277,7 +286,9 @@ function setChart(csvData, colorScale, expressed) {
         })
         .style("fill", function (d) {
             return choropleth(d, colorScale, expressed);
-        });
+        })
+        .attr("transform", translate);
+
 
     //annotate bars with attribute value text
     var numbers = chart.selectAll(".numbers")
@@ -288,7 +299,7 @@ function setChart(csvData, colorScale, expressed) {
             return b[expressed] - a[expressed]
         })
         .attr("class", function (d) {
-            return "numbers " + d.adm1_code;
+            return "numbers " + d.ABBR;
         })
         .attr("text-anchor", "middle")
         .attr("x", function (d, i) {
@@ -300,16 +311,18 @@ function setChart(csvData, colorScale, expressed) {
         })
         .text(function (d) {
             return d[expressed];
-        });
+        })
+        .attr("transform", translate);
+
 
     var chartTitle = chart.append("text")
-        .attr("x", 50)
+        .attr("x", 400)
         .attr("y", 30)
         .attr("class", "chartTitle")
         .text(expressed + " in each state");
 
     //create vertical axis generator
-    var yAxis = d3.axisLeft(yScale)
+    var yAxis = d3.axisLeft(yScaleAxis)
         //.scale(yScale)
         //        .orient("left");
 
