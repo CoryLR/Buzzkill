@@ -1,0 +1,52 @@
+ID	ABBR	name	BDP	BDI	BDF	LDM	PCC	HLL
+1	AK	Alaska	19.8	7.7	5.6	10.7	2.79	2
+2	AL	Alabama	12.8	7	4.5	11.8	1.99	1
+3	AR	Arkansas	14.1	7.3	4.4	10.4	1.79	1
+4	AZ	Arizona	15.7	7	4.6	14.3	2.37	1
+5	CA	California	15.6	6.9	3.9	12	2.3	2
+6	CO	Colorado	17.8	6.8	4.2	12.7	2.76	2
+7	CT	Connecticut	17.1	6.5	4.1	8.5	2.36	2
+8	DC	District of Columbia	22.7	6.3	4	7.7	3.85	2
+9	DE	Delaware	16.8	6.8	4.6	9.3	3.59	3
+10	FL	Florida	16.4	7.2	4.7	11.8	2.59	2
+11	GA	Georgia	14.5	7.5	4.6	8.6	1.96	2
+12	HI	Hawaii	20.8	7.7	5	6.9	2.58	1
+13	IA	Iowa	22.7	7.7	4.7	8.8	2.35	2
+14	ID	Idaho	15.4	7	4.1	11	2.82	1
+15	IL	Illinois	20.9	7.6	4.3	9.2	2.32	2
+16	IN	Indiana	15.4	7.5	4.9	10.4	1.97	2
+17	KS	Kansas	16.6	7.2	4.1	8.9	1.92	3
+18	KY	Kentucky	13.5	8.3	5.7	11.5	1.88	1
+19	LA	Louisiana	16.5	7.2	4.3	9.8	2.58	2
+20	MA	Massachusetts	18.4	6.6	4.3	8.4	2.55	1
+21	MD	Maryland	15.9	6.9	3.7	6.9	2.15	3
+22	ME	Maine	19.4	7.2	4.8	9	2.71	2
+23	MI	Michigan	20.1	7.3	4.7	10	2.32	1
+24	MN	Minnesota	20.4	7.1	3.6	7.9	2.8	1
+25	MO	Missouri	15.9	7.7	5.2	8.8	2.4	2
+26	MS	Mississippi	13.5	7.5	4.6	10.3	2.23	1
+27	MT	Montana	20.5	7.3	4.6	12.2	3.08	2
+28	NC	North Carolina	14.4	7	4	10.3	2.06	2
+29	ND	North Dakota	24.7	7.9	4.3	7.7	3.41	2
+30	NE	Nebraska	21.2	7.3	4.1	8	2.29	2
+31	NH	New Hampshire	18.3	7.3	5.1	10.1	4.55	1
+32	NJ	New Jersey	16.9	6.7	4.1	7.5	2.37	1
+33	NM	New Mexico	14.4	7.4	3.8	22.5	2.42	1
+34	NV	Nevada	16.5	6.6	5.3	12.2	3.35	3
+35	NY	New York	15.4	6.6	3.6	6.8	2.19	1
+36	OH	Ohio	19.5	7.7	4.9	10.4	2.03	2
+37	OK	Oklahoma	13.5	7.9	4.8	13.8	1.91	1
+38	OR	Oregon	17.7	6.3	4.5	12.8	2.69	2
+39	PA	Pennsylvania	17.9	7.3	4	8.1	2.34	1
+40	RI	Rhode Island	19.6	6.7	4.1	9.1	2.39	1
+41	SC	South Carolina	14.9	7.1	4.5	11.8	2.28	1
+42	SD	South Dakota	18.3	7.5	4.3	16.3	2.73	3
+43	TN	Tennessee	11.3	7	5.1	12	2.01	2
+44	TX	Texas	16.2	7.5	4.9	13.5	2.23	2
+45	UT	Utah	11	7.7	4.9	8.7	1.37	2
+46	VA	Virginia	15.8	7.2	4.3	8.7	2.11	3
+47	VT	Vermont	19.6	7.2	4.7	7.9	3.05	1
+48	WA	Washington	17.7	6.8	4.3	11.1	2.26	1
+49	WI	Wisconsin	23	7.2	4.2	8.8	2.97	2
+50	WV	West Virginia	10.5	8.8	5.8	14.3	1.78	1
+51	WY	Wyoming	17.8	7.5	4.4	14.5	2.71	2

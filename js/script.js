@@ -1,13 +1,17 @@
 // Start JS with self-executing anonymous function
 (function () {
 
+    // initialize chart properties & expressed
     var [chartWidth, chartHeight, leftPadding, rightPadding, topBottomPadding, chartInnerWidth, chartInnerHeight, translate, yScale, yScaleAxis] = setChartVars();
 
-    // All other JS contained within this function
+    // initialize attribute variables
+    var [attrArray, attrName, attrDesc, expressed] = prepAttrVars();
+
+    // All other JS contained within this function, started on windowload
     function main() {
 
 
-        // prep map variables
+        // initialize map properties
         var [width, height, map, path] = prepMapVars();
 
         // LOAD DATA
@@ -20,8 +24,6 @@
             // unpack the loaded data into variables
             var [csvData, jsonStates] = promiseValues
 
-            // initialize necessary variables
-            var [attrArray, expressed, attrName, attrDesc, topoJsonStates] = prepAttrVars();
 
             // translate states TopoJSON
             var topoJsonStates = topojson.feature(jsonStates, jsonStates.objects.ne_states_d3display).features;
@@ -71,12 +73,6 @@
 
     function prepAttrVars() {
 
-        var attrArray = ["BDP", "BDI", "BDF", "LDM", "PCC", "HLL"];
-
-        // initial & current attribute displayed on the map
-        var expressed = attrArray[0];
-        console.log(expressed);
-
         var attrName = {
             BDP: "Binge Drinking Prevalence",
             BDI: "Binge Drinking Intensity",
@@ -97,7 +93,13 @@
 
         // descriptions Source: https://www.cdc.gov/cdi/definitions/alcohol.html
 
-        return [attrArray, expressed, attrName, attrDesc]
+        var attrArray = ["BDP", "BDI", "BDF", "LDM", "PCC", "HLL"];
+
+        // initial & current attribute displayed on the map
+        var expressed = attrArray[0];
+        console.log(expressed);
+
+        return [attrArray, attrName, attrDesc, expressed]
 
     };
 
@@ -193,7 +195,7 @@
     function setEnumerationUnits(topoJsonStates, map, path, colorScale, expressed) {
 
 
-        //add states to map - broken somewhere in this var block
+        //add states to map
         var regions = map.selectAll(".states")
             .data(topoJsonStates)
             .enter()
@@ -205,7 +207,14 @@
             .attr("d", path)
             .style("fill", function (d) {
                 return choropleth(d.properties, colorScale, expressed);
+            })
+            .on("mouseover", function (d) {
+                highlight(d.properties);
+            })
+            .on("mouseout", function (d) {
+                dehighlight(d.properties);
             });
+
     };
 
     function choropleth(props, colorScale, expressed) {
@@ -245,6 +254,8 @@
             .range([chartHeight, 0])
             .domain([0, 30]);
 
+
+
         return [chartWidth, chartHeight, leftPadding, rightPadding, topBottomPadding, chartInnerWidth, chartInnerHeight, translate, yScale, yScaleAxis]
     };
 
@@ -283,7 +294,9 @@
             .style("fill", function (d) {
                 return choropleth(d, colorScale, expressed);
             })
-            .attr("transform", translate);
+            .attr("transform", translate)
+            .on("mouseover", highlight)
+            .on("mouseout", dehighlight);
 
 
         //        //annotate bars with attribute value text
@@ -425,6 +438,48 @@
             .text(expressed + " in each state");
     };
 
+    function highlight(props) {
+        //change stroke
+        var selected = d3.selectAll("." + props.postal)
+            .style("stroke", "black")
+            .style("stroke-width", "4");
+        var selected2 = d3.selectAll("." + props.ABBR)
+            .style("stroke", "black")
+            .style("stroke-width", "4");
+        setLabel(props)
+    };
+
+    function dehighlight(props) {
+        var selected = d3.selectAll("." + props.postal)
+            .style("stroke", "white")
+            .style("stroke-width", "1");
+        var selected2 = d3.selectAll("." + props.ABBR)
+            .style("stroke", "white")
+            .style("stroke-width", "1");
+        d3.select(".infolabel")
+            .remove();
+    };
+
+    //function to create dynamic label
+    function setLabel(props) {
+        //label content
+        var labelAttribute = "<h1>" + props[expressed] +
+            "</h1><b>" + expressed + "</b>";
+
+        //create info label div
+        var infolabel = d3.select("body")
+            .append("div")
+            .attr("class", "infolabel")
+            .attr("id", "label")
+            //            .attr("id", props.ABBR + "_label")
+            .html(labelAttribute);
+        //console.log(props.postal);
+
+        var regionName = infolabel.append("div")
+            .attr("class", "labelname")
+            .html(props.name);
+        //console.log(props);
+    };
 
     // Start JavaScript when window loads
     window.onload = main()

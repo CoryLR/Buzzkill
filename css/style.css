@@ -71,3 +71,22 @@ body {
 option {
     font-weight: normal;
 }
+
+.infolabel {
+    position: absolute;
+    height: 50px;
+    min-width: 100px;
+    top: 100px;
+    right: 100px;
+    color: black;
+    background-color: lightgray;
+    border: solid thin #fff;
+    padding: 5px 10px;
+}
+
+.infolabel h1 {
+    margin: 0 20px 0 0;
+    padding: 0;
+    display: inline-block;
+    line-height: 1em;
+}
