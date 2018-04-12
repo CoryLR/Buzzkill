@@ -17,8 +17,8 @@
         // LOAD DATA
         // Load the data & states layer asynchronously (d3.queue is depreciated!)
         // All code gets executed within Promise.all so that the data is available for use
-        var csvDataPromise = d3.csv("../data/cdc_alcohol_byState.csv")
-        var jsonStatesPromise = d3.json("../data/ne_states_d3display.topojson")
+        var csvDataPromise = d3.csv("data/cdc_alcohol_byState.csv")
+        var jsonStatesPromise = d3.json("data/ne_states_d3display.topojson")
         Promise.all([csvDataPromise, jsonStatesPromise]).then(function (promiseValues) {
 
             // unpack the loaded data into variables
