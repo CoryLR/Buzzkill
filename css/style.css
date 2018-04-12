@@ -112,20 +112,7 @@ option {
 
 .infolabel {
     position: absolute;
-    bottom: 320px;
-    right: 6px;
-    height: 65px;
-    min-width: 65px;
-    color: black;
-    /*    background-color: lightgray;*/
-    /*    border: solid thin #fff;*/
-    padding: 5px 10px;
-    text-align: right;
-}
-
-.infolabelPlaceholder {
-    position: absolute;
-    bottom: 320px;
+    bottom: 350px;
     right: 6px;
     height: 65px;
     min-width: 65px;
@@ -148,4 +135,5 @@ option {
 #moreInfoWrapper {
     font: 15px veranda, sans-serif;
     text-align: right;
+    height: 80px;
 }
