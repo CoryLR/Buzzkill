@@ -16,8 +16,16 @@ body {}
     margin-bottom: -10px;
 }
 
-#quote {
+#textContentArea {
+    font: 15px veranda, sans-serif;
+}
+
+#quoteArea {
     padding: 15px 0;
+}
+
+#quote {
+    font: 15px veranda, serif;
 }
 
 #contentWrapper {
