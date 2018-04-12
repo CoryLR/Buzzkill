@@ -84,8 +84,8 @@
         // Attribute full names
         var attrName = {
             BDP: "Binge Drinking Prevalence (BDP)",
-            BDI: "Binge Drinking Intensity (BDI)",
-            BDF: "Binge Drinking Frequency (BDF)",
+            BDI: "*Binge Drinking Intensity (BDI)",
+            BDF: "*Binge Drinking Frequency (BDF)",
             LDM: "Liver Disease Mortality (LDM)",
             PCC: "Per Capita Alcohol Consumption (PCC)",
             HLL: "Commercial Host Liability Laws Category (HLL)"
@@ -94,8 +94,8 @@
         // Attribute full descriptions & units
         var attrDesc = {
             BDP: "<u>Percent</u> of adults aged ≥18 years who report having ≥5 drinks (men) or ≥4 drinks (women) on ≥1 occasion during the previous 30 days; 2014",
-            BDI: "Age-adjusted mean of largest <u>number of drinks</u> consumed on an occasion in the previous 30 days among adult binge drinkers aged ≥18 years; 2014",
-            BDF: "Age-adjusted mean of <u>binge drinking episodes</u> during the previous 30 days among adult binge drinkers aged ≥18 years; 2014",
+            BDI: "Age-adjusted mean of largest <u>number of drinks</u> consumed on an occasion in the previous 30 days *among adult binge drinkers aged ≥18 years; 2014",
+            BDF: "Age-adjusted mean of <u>binge drinking episodes</u> during the previous 30 days *among adult binge drinkers aged ≥18 years; 2014",
             LDM: "<u>Deaths per 100,000</u> with International Classification of Diseases (ICD)-10 codes K70 or K73–K74 as the underlying cause of death among residents during a calendar year; 2014",
             PCC: "<u>Gallons of pure alcohol</u> consumed during a calendar year among persons aged >= 14 years; 2014",
             HLL: "With commercial host liability laws, alcohol retailers/hosts are potentially liable for alcohol-related harms. <u>State categories</u>: (1) commercial host liability with no major limitations; (2) commercial host liability with major limitations; or (3) no commercial host liability; 2015"
