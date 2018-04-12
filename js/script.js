@@ -24,8 +24,6 @@
             // unpack the loaded data into variables
             var [csvData, jsonStates] = promiseValues
 
-
-
             // translate states TopoJSON
             var topoJsonStates = topojson.feature(jsonStates, jsonStates.objects.ne_states_d3display).features;
 
@@ -48,12 +46,13 @@
     };
 
     function prepMapVars() {
+
         //map frame dimensions
         var width = 650,
-            height = 500;
+            height = 420;
 
         //create new svg container for the map
-        var map = d3.select("body")
+        var map = d3.select("#mapWrapper")
             .append("svg")
             .attr("class", "map")
             .attr("width", width)
@@ -61,10 +60,8 @@
 
         //create Albers equal area conic projection centered on France
         var projection = d3.geoAlbers()
-            .center([13, 38])
+            .center([12, 35])
 
-        //        .rotate([-2, 0, 0])
-        //        .parallels([43, 62])
         .scale(800) //        .translate([width / 2, height / 2]);
 
         var path = d3.geoPath()
@@ -76,27 +73,30 @@
 
     function prepAttrVars() {
 
+        // Attribute acronyms
+        var attrArray = ["BDP", "BDI", "BDF", "LDM", "PCC", "HLL"];
+
+        // Attribute full names
         var attrName = {
-            BDP: "Binge Drinking Prevalence",
-            BDI: "Binge Drinking Intensity",
-            BDF: "Binge Drinking Frequency",
-            LDM: "Liver Disease Mortality",
-            PCC: "Per Capita Alcohol Consumption",
-            HLL: "Commercial Host Liability Laws Category"
+            BDP: "Binge Drinking Prevalence (BDP)",
+            BDI: "Binge Drinking Intensity (BDI)",
+            BDF: "Binge Drinking Frequency (BDF)",
+            LDM: "Liver Disease Mortality (LDM)",
+            PCC: "Per Capita Alcohol Consumption (PCC)",
+            HLL: "Commercial Host Liability Laws Category (HLL)"
         };
 
+        // Attribute full descriptions & units
         var attrDesc = {
-            BDP: "Percent of adults aged ≥18 years who report having ≥5 drinks (men) or ≥4 drinks (women) on ≥1 occasion during the previous 30 days (2014)",
-            BDI: "Age-adjusted mean of largest number of drinks consumed on an occasion in the previous 30 days among adult binge drinkers aged ≥18 years (2014)",
-            BDF: "Age-adjusted mean of binge drinking episodes during the previous 30 days among adult binge drinkers aged ≥18 years (2014)",
-            LDM: "Deaths per 100,000 with International Classification of Diseases (ICD)-10 codes K70 or K73–K74 as the underlying cause of death among residents during a calendar year (2014)",
-            PCC: "Gallons of pure alcohol consumed during a calendar year among persons aged >= 14 years (2014)",
-            HLL: "With commercial host liability laws, alcohol retailers/hosts are potentially liable for alcohol-related harms. State has: (1) commercial host liability with no major limitations; (2) commercial host liability with major limitations; or (3) no commercial host liability; (2015)"
+            BDP: "<u>Percent</u> of adults aged ≥18 years who report having ≥5 drinks (men) or ≥4 drinks (women) on ≥1 occasion during the previous 30 days; 2014",
+            BDI: "Age-adjusted mean of largest <u>number of drinks</u> consumed on an occasion in the previous 30 days among adult binge drinkers aged ≥18 years; 2014",
+            BDF: "Age-adjusted mean of <u>binge drinking episodes</u> during the previous 30 days among adult binge drinkers aged ≥18 years; 2014",
+            LDM: "<u>Deaths per 100,000</u> with International Classification of Diseases (ICD)-10 codes K70 or K73–K74 as the underlying cause of death among residents during a calendar year; 2014",
+            PCC: "<u>Gallons of pure alcohol</u> consumed during a calendar year among persons aged >= 14 years; 2014",
+            HLL: "With commercial host liability laws, alcohol retailers/hosts are potentially liable for alcohol-related harms. <u>State categories</u>: (1) commercial host liability with no major limitations; (2) commercial host liability with major limitations; or (3) no commercial host liability; 2015"
         };
-
         // descriptions Source: https://www.cdc.gov/cdi/definitions/alcohol.html
 
-        var attrArray = ["BDP", "BDI", "BDF", "LDM", "PCC", "HLL"];
 
         // initial & current attribute displayed on the map
         var expressed = attrArray[0];
@@ -107,26 +107,6 @@
     };
 
     function makeMap(topoJsonStates, map, path, csvData, expressed) {
-
-
-        // NOT FOR CORY
-        //add states countries to map
-        //    var statesLayer = map.append("path")
-        //        .datum(topoJsonStates)
-        //        .attr("class", "states")
-        //        .attr("d", path);
-
-
-
-        //    var regions = map.selectAll(".regions")
-        //        .data(topoJsonStates)
-        //        .enter()
-        //        .append("path")
-        //        .attr("class", function (d) {
-        //            return "states " + d.properties.postal;
-        //        })
-        //        .attr("d", path);
-
 
         //create the color scale
         var colorScale = makeColorScale(csvData, expressed);
@@ -140,6 +120,7 @@
     };
 
     function joinData(csvData, topoJsonStates, attrArray) {
+
         //loop through csv to assign each set of csv attribute values to geojson region
         for (var i = 0; i < csvData.length; i++) {
             var csvRegion = csvData[i]; //the current region
@@ -168,11 +149,11 @@
     //function to create color scale generator
     function makeColorScale(csvData, expressed) {
         var colorClasses = [
-        "#D4B9DA",
-        "#C994C7",
-        "#DF65B0",
-        "#DD1C77",
-        "#980043"
+        "#ffe6bf",
+        "#fdcc8a",
+        "#fc8d59",
+        "#e34a33",
+        "#b30000"
     ];
 
         //create color scale generator
@@ -213,8 +194,7 @@
             })
             .on("mouseover", function (d) {
                 highlight(d.properties);
-            })
-            .on("mouseout", function (d) {
+            }).on("mouseout", function (d) {
                 dehighlight(d.properties);
             });
 
@@ -234,7 +214,7 @@
     function setChartVars() {
         var chartWidth = 650,
             //    var chartWidth = window.innerWidth * 0.425,
-            chartHeight = 300,
+            chartHeight = 200,
             leftPadding = 25,
             rightPadding = 2,
             topBottomPadding = 5,
@@ -245,8 +225,6 @@
             translate = "translate(" + leftPadding + "," + topBottomPadding + ")";
 
         //create a second svg element to hold the bar chart
-        var br = d3.select("body")
-            .append("br")
 
         //        var minPop = d3.min(cityPop, function (d) {
         //            return d.population;
@@ -322,7 +300,7 @@
             .call(yAxis);
 
         // chart frame dimensions
-        var chart = d3.select("body")
+        var chart = d3.select("#chartWrapper")
             .append("svg")
             .attr("width", chartWidth)
             .attr("height", chartHeight)
@@ -382,10 +360,13 @@
         //            .attr("transform", translate);
 
         var chartTitle = chart.append("text")
-            .attr("x", 400)
+            .attr("x", 430)
             .attr("y", 30)
             .attr("class", "chartTitle")
             .text(expressed + " in each state");
+
+        d3.select("#attributeDescriptionText")
+            .html("<strong>" + expressed + ":</strong> " + attrDesc[expressed]);
 
         //create vertical axis generator
         var yAxis = d3.axisLeft(yScaleAxis)
@@ -410,21 +391,22 @@
 
     function createDropdown(attrArray, csvData) {
         //add select element
-        var dropdown = d3.select("body")
+        var dropdown = d3.select("#dropdownWrapper")
             .append("select")
             .attr("class", "dropdown")
             .on("change", function () {
                 changeAttribute(this.value, csvData)
             });
 
-        //add initial option
-        var titleOption = dropdown.append("option")
-            .attr("class", "titleOption")
-            .attr("disabled", "true")
-            .text("Select Attribute");
+        //        //add initial option
+        //        var titleOption = dropdown.append("option")
+        //            .attr("class", "titleOption")
+        //            .attr("disabled", "true")
+        //            .text("Select Attribute");
 
         //add attribute name options
         var attrOptions = dropdown.selectAll("attrOptions")
+            //            .data(attrName)
             .data(attrArray)
             .enter()
             .append("option")
@@ -432,8 +414,9 @@
                 return d
             })
             .text(function (d) {
-                return d
+                return attrName[d]
             });
+
     };
 
 
@@ -441,6 +424,9 @@
     function changeAttribute(attribute, csvData) {
         //change the expressed attribute
         expressed = attribute;
+
+        d3.select("#attributeDescriptionText")
+            .html("<strong>" + expressed + ":</strong> " + attrDesc[expressed]);
 
         var maxAttr = d3.max(csvData, function (d) {
             return parseFloat(d[expressed]);
@@ -536,11 +522,11 @@
     //function to create dynamic label
     function setLabel(props) {
         //label content
-        var labelAttribute = "<h1>" + props[expressed] +
-            "</h1><b>" + expressed + "</b>";
+        var labelAttribute = "<span id='infoLabelNumber'>" + props[expressed] +
+            "</span><br>" + expressed + "";
 
         //create info label div
-        var infolabel = d3.select("body")
+        var infolabel = d3.select("#infoLabelWrapper")
             .append("div")
             .attr("class", "infolabel")
             .attr("id", "label")
