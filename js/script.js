@@ -25,6 +25,7 @@
             var [csvData, jsonStates] = promiseValues
 
 
+
             // translate states TopoJSON
             var topoJsonStates = topojson.feature(jsonStates, jsonStates.objects.ne_states_d3display).features;
 
@@ -33,6 +34,8 @@
 
             // make map & coordinated visualization
             makeMap(topoJsonStates, map, path, csvData, expressed);
+
+            updateChart(csvData, chartHeight);
 
             // x
             createDropdown(attrArray, csvData)
@@ -163,7 +166,7 @@
     };
 
     //function to create color scale generator
-    function makeColorScale(data, expressed) {
+    function makeColorScale(csvData, expressed) {
         var colorClasses = [
         "#D4B9DA",
         "#C994C7",
@@ -178,10 +181,10 @@
 
         //build two-value array of minimum and maximum expressed attribute values
         var minmax = [
-        d3.min(data, function (d) {
+        d3.min(csvData, function (d) {
                 return parseFloat(d[expressed]);
             }),
-        d3.max(data, function (d) {
+        d3.max(csvData, function (d) {
                 return parseFloat(d[expressed]);
             })
     ];
@@ -245,25 +248,80 @@
         var br = d3.select("body")
             .append("br")
 
+        //        var minPop = d3.min(cityPop, function (d) {
+        //            return d.population;
+        //        });
+        //
+        //        //find the maximum value of the array
+        //        var maxPop = d3.max(cityPop, function (d) {
+        //            return d.population;
+        //        });       
+
+        //        var maxAttr = d3.max(csvData, function (d) {
+        //            return parseFloat(d[expressed]);
+        //        });
+
+        var maxAttr = 25;
+
         //create a scale to size bars proportionally to frame
         var yScale = d3.scaleLinear()
             .range([0, chartHeight])
-            .domain([0, 30]);
+            .domain([0, maxAttr]);
 
         var yScaleAxis = d3.scaleLinear()
             .range([chartHeight, 0])
-            .domain([0, 30]);
+            .domain([0, maxAttr]);
 
 
 
         return [chartWidth, chartHeight, leftPadding, rightPadding, topBottomPadding, chartInnerWidth, chartInnerHeight, translate, yScale, yScaleAxis]
     };
 
+    function updateChart(csvData, chartHeight) {
+
+        var maxAttr = d3.max(csvData, function (d) {
+            return parseFloat(d[expressed]);
+        });
+
+        //create a scale to size bars proportionally to frame
+        var yScale = d3.scaleLinear()
+            .range([0, chartHeight])
+            .domain([0, maxAttr]);
+
+        var yScaleAxis = d3.scaleLinear()
+            .range([chartHeight, 0])
+            .domain([0, maxAttr]);
+
+        var yAxis = d3.axisLeft(yScaleAxis)
+
+        //update the charts axis 
+        d3.selectAll("g.axis")
+            .call(yAxis);
+    };
+
     //function to create coordinated bar chart
     function setChart(csvData, colorScale, expressed) {
-        //chart frame dimensions
 
+        var maxAttr = d3.max(csvData, function (d) {
+            return parseFloat(d[expressed]);
+        });
 
+        //create a scale to size bars proportionally to frame
+        var yScale = d3.scaleLinear()
+            .range([0, chartHeight])
+            .domain([0, maxAttr]);
+
+        var yScaleAxis = d3.scaleLinear()
+            .range([chartHeight, 0])
+            .domain([0, maxAttr]);
+
+        var yAxis = d3.axisLeft(yScaleAxis)
+
+        //update the charts axis 
+        d3.selectAll("g.axis")
+            .call(yAxis);
+
+        // chart frame dimensions
         var chart = d3.select("body")
             .append("svg")
             .attr("width", chartWidth)
@@ -380,24 +438,28 @@
 
 
     ////dropdown change listener handler
-    //function changeAttribute(attribute, csvData) {
-    //    //change the expressed attribute
-    //    expressed = attribute;
-    //    console.log(expressed);
-    //
-    //    //recreate the color scale
-    //    var colorScale = makeColorScale(csvData, expressed);
-    //
-    //    //recolor enumeration units
-    //    var regions = d3.selectAll(".states")
-    //        .style("fill", function (d) {
-    //            return choropleth(d.properties, colorScale, expressed)
-    //        });
-    //};
-
     function changeAttribute(attribute, csvData) {
         //change the expressed attribute
         expressed = attribute;
+
+        var maxAttr = d3.max(csvData, function (d) {
+            return parseFloat(d[expressed]);
+        });
+
+        //create a scale to size bars proportionally to frame
+        yScale = d3.scaleLinear()
+            .range([0, chartHeight])
+            .domain([0, maxAttr]);
+
+        yScaleAxis = d3.scaleLinear()
+            .range([chartHeight, 0])
+            .domain([0, maxAttr]);
+
+        var yAxis = d3.axisLeft(yScaleAxis)
+
+        //update the charts axis 
+        d3.selectAll("g.axis")
+            .call(yAxis);
 
         //recreate the color scale
         var colorScale = makeColorScale(csvData, expressed);
@@ -436,6 +498,17 @@
 
         var chartTitle = d3.select(".chartTitle")
             .text(expressed + " in each state");
+
+        //        var minAttr = d3.min(csvData, function (d) {
+        //                return parseFloat(d[expressed]);
+        //            })
+        var maxAttr = d3.max(csvData, function (d) {
+            return parseFloat(d[expressed]);
+        });
+
+
+
+
     };
 
     function highlight(props) {
